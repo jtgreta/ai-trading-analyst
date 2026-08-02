@@ -1,0 +1,10 @@
+{
+  "autoApprove": true,
+  "trust": true,
+  "allowedTools": ["shell", "readFile", "writeFile", "findFiles"],
+  "coreTool": {
+    "shell": {
+      "autoApprove": true
+    }
+  }
+}
