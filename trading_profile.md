@@ -13,7 +13,7 @@ Current capital: $100
 
 
 2. My AI Signal System (SMC Upgraded)
-I use a multi-stage AI signal system powered by Gemini CLI skills. The system has evolved from simple MA confluence to an institutional "Smart Money Concepts" (SMC) framework.
+I use a multi-stage AI signal system powered by custom skills. The system has evolved from simple MA confluence to an institutional "Smart Money Concepts" (SMC) framework.
 
 ### Stage 1 — Scanner (Momentum Discovery)
 **Goal**: Identify high-volume movers and rank them by institutional priority.

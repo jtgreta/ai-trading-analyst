@@ -8,7 +8,7 @@ Consistent compounding comes from trading high-conviction setups. While crypto i
 
 1. **WAITING ROOM replaces dead-end blocks**:
    - When no valid trade exists, every analysis outputs a full WAITING ROOM section.
-   - The WAITING ROOM tells Jerome: why not now, what would unlock a trade, key levels to watch, patterns to look for, pre-conditions checklist, and when to check back.
+   - The WAITING ROOM tells jtgreta: why not now, what would unlock a trade, key levels to watch, patterns to look for, pre-conditions checklist, and when to check back.
    - There is no output that ends without actionable information.
 
 2. **Grade System (Score-Based)**:

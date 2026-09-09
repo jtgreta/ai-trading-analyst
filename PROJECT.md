@@ -1,12 +1,12 @@
-# Gemini Trading Analyst — Project Documentation
-**Owner:** Jerome | **Status:** Active — Manual Analysis Tool  
+# Trading Analyst — Project Documentation
+**Owner:** jtgreta | **Status:** Active — Manual Analysis Tool  
 **Last updated:** 2026-06-08 | **Session continuity doc**
 
 ---
 
 ## Project Overview
 
-A set of Gemini CLI skills for **manual institutional crypto trading analysis**. Jerome types a prompt, Gemini fetches live Binance Futures data, runs full SMC analysis (BOS/ChoCh, FVG, Order Blocks, OTE, Inducement), outputs results to terminal, and sends a summary to Telegram.
+A set of AI-assisted skills for **manual institutional crypto trading analysis**. Jerome types a prompt, the AI fetches live Binance Futures data, runs full SMC analysis (BOS/ChoCh, FVG, Order Blocks, OTE, Inducement), outputs results to terminal, and sends a summary to Telegram.
 
 The system covers the full trade lifecycle:
 - **Pre-session**: market bias + funding check
@@ -90,26 +90,28 @@ Every analysis script (Scalper, Swing, etc.) outputs exactly 4 sections:
 ## Directory Structure
 
 ```
-C:\Users\Jerome\gemini-trading-analyst
-    ├── .gemini
-    │       ├── settings.json
-    │       └── skills
-    │               ├── market_bias
-    │               │       SKILL.md      ← Pre-Session Bias Briefing
-    │               ├── funding
-    │               │       SKILL.md      ← Funding Rate Scanner
-    │               ├── hunter
-    │               │       SKILL.md      ← Pre-Breakout Coil Logic (SMC)
-    │               ├── scalper
-    │               │       SKILL.md      ← Precision Execution (SMC)
-    │               ├── scanner
-    │               │       SKILL.md      ← Momentum Discovery (SMC)
-    │               ├── swing
-    │               │       SKILL.md      ← Multi-day Trend (SMC)
-    │               ├── manage
-    │               │       SKILL.md      ← Position Manager
-    │               └── journal
-    │                       SKILL.md      ← Trade Journal & Review
+C:\Users\Jerome\ai-trading-analyst
+    ├── AGENTS.md              ← AI assistant instructions (auto-read by any AI tool)
+    ├── PROJECT.md             ← this file
+    │
+    ├── ── SKILLS (stored globally in ~/.agents/skills/) ──
+    ├── ~/.agents/skills
+    │       ├── market-bias
+    │       │       SKILL.md      ← Pre-Session Bias Briefing
+    │       ├── funding
+    │       │       SKILL.md      ← Funding Rate Scanner
+    │       ├── hunter
+    │       │       SKILL.md      ← Pre-Breakout Coil Logic (SMC)
+    │       ├── scalper
+    │       │       SKILL.md      ← Precision Execution (SMC)
+    │       ├── scanner
+    │       │       SKILL.md      ← Momentum Discovery (SMC)
+    │       ├── swing
+    │       │       SKILL.md      ← Multi-day Trend (SMC)
+    │       ├── manage
+    │       │       SKILL.md      ← Position Manager
+    │       └── journal
+    │               SKILL.md      ← Trade Journal & Review
     │
     ├── ── PRE-SESSION ──
     ├── skill_market_bias.py      ← BTC/ETH structure + funding + LS → RISK ON/OFF verdict
@@ -138,14 +140,14 @@ C:\Users\Jerome\gemini-trading-analyst
     ├── check_bias.py        ← Retired → use skill_market_bias.py
     ├── long_funding_plan.py ← Retired → use skill_funding.py
     │
-    └── gemini_trading_analyst_doc.md  ← this file
+    └── PROJECT.md  ← this file
 ```
 
 ---
 
 ## Python File Naming Convention
 
-**All Python files created by Gemini CLI for these skills must follow this format:**
+**All Python files created for these skills must follow this format:**
 `skill_<skillname>_<purpose>.py`
 
 ---
