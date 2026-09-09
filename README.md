@@ -4,7 +4,7 @@
 
 This repo turns any AI coding agent (opencode, Claude, Codex, Cursor, Gemini CLI, Copilot, goose, and more) into a manual-analysis trading copilot. It runs a full institutional workflow — market bias → funding check → scanner → scalper/hunter/swing analysis → position management → trade journal — all through natural-language prompts, with a complete graded trade plan and optional Telegram dispatch.
 
-> **⚠️ DISCLAIMER: Not financial advice.** This is a *manual analysis tool*, not an automated trading bot. Trading derivatives is high risk and you can lose your entire account. You are solely responsible for your decisions.
+> **⚠️ IMPORTANT: Use this at your own risk. This is an AI-assisted analysis tool, not financial advice.** All outputs are AI-generated and may contain errors — they are **not** guarantees of accuracy or future performance. Trading derivatives carries substantial risk of loss, including total loss of capital. **The authors and contributors are NOT responsible for any losses you may incur.** See full [Disclaimer & Risk Disclosure](DISCLAIMER.md) before using this Software.
 
 ---
 
@@ -123,6 +123,8 @@ The trading philosophy is enforced through [`AGENTS.md`](AGENTS.md) and the docs
 
 ---
 
-## License
+## License & Disclaimer
 
-MIT — see [LICENSE](LICENSE). Use it, fork it, modify it, learn from it. If you trade with it, do so responsibly.
+MIT — see [LICENSE](LICENSE). Use it, fork it, modify it, learn from it.
+
+**Before using this Software, you MUST read and agree to the [Disclaimer & Risk Disclosure](DISCLAIMER.md).** The authors and contributors are not responsible for any trading losses. If this tool helps you — congrats. If it doesn't — that's on you, not us.
