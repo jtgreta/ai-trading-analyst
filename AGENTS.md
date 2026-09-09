@@ -1,5 +1,14 @@
 # Trading Mandate: Institutional Adaptive Mode
 
+## Repo Layout (THIS REPO)
+- **Skills live in** `.agents/skills/<skill-name>/SKILL.md` inside this repository — the cross-tool standard location, auto-discovered by opencode, Claude, Codex, Cursor, Gemini CLI, Copilot, goose, and others.
+- **Python helpers live in** `scripts/` (`scripts/<script>.py`). They import `scripts/trading_utils.py` directly from the same folder (no sys.path bootstrap needed).
+- **Docs live in** `docs/` (`docs/PROJECT.md`, `docs/trading_rules.md`, `docs/trading_routine.md`, `docs/trading_indicators.md`, `docs/trading_profile.md`).
+- **User config lives in** `config/trading.json` (capital, max risk, sizing-rule overlay; loaded by `scripts/trading_utils.py` at runtime). Start from `config/trading.json.example`.
+- Before running a script, check it exists with `Test-Path "scripts\<script>.py"`; if found, run it directly — do not rewrite.
+- Scripts available: `funding.py`, `hunter_coil.py`, `hunter_filter.py`, `hunter_scan.py`, `journal.py`, `manage.py`, `market_bias.py`, `scalper_analyze.py`, `scanner_filter.py`, `scanner_run.py`, `swing_analyze.py`.
+- Skills available: `funding`, `hunter`, `journal`, `manage`, `market-bias`, `scalper`, `scanner`, `swing` (trading suite) + `binance`, `crypto-market-rank`, `find-skills`, `meme-rush`, `query-token-audit`, `query-token-info`, `trading-signal` (market tools).
+
 ## Core Philosophy
 **The edge is not having more signals. It is having the right signals at the right time.**
 Consistent compounding comes from trading high-conviction setups. While crypto is 24/7, institutional volume clusters in specific windows; we use these windows to modulate aggressiveness, not to block opportunity.
@@ -8,7 +17,7 @@ Consistent compounding comes from trading high-conviction setups. While crypto i
 
 1. **WAITING ROOM replaces dead-end blocks**:
    - When no valid trade exists, every analysis outputs a full WAITING ROOM section.
-   - The WAITING ROOM tells jtgreta: why not now, what would unlock a trade, key levels to watch, patterns to look for, pre-conditions checklist, and when to check back.
+   - The WAITING ROOM tells the trader: why not now, what would unlock a trade, key levels to watch, patterns to look for, pre-conditions checklist, and when to check back.
    - There is no output that ends without actionable information.
 
 2. **Grade System (Score-Based)**:

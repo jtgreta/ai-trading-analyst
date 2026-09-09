@@ -23,4 +23,13 @@ __pycache__/
 *.swo
 
 # Project specific
+# Trade journal data (personal, user-specific)
+journal.json
+# Personal trader profile (user-specific)
+trading_profile.md
+# User risk config (use config/trading.json.example)
+config/trading.json
+# Local helper script (user-specific)
+send_telegram.ps1
+*.log
 

@@ -1,0 +1,16 @@
+{
+  "_comment": "Copy this file to config/trading.json and edit for your own account. Loaded by scripts/trading_utils.py at runtime. Any key can be removed to fall back to the built-in default. See docs/trading_profile.md for guidance on choosing values.",
+  "capital": 100.0,
+  "max_risk": 4.0,
+  "min_rr": 2.0,
+  "scalp_rules": {
+    "major":  { "lev": 10, "margin": 10, "max_sl": 0.030 },
+    "midcap": { "lev": 5,  "margin": 7,  "max_sl": 0.085 },
+    "new":    { "lev": 3,  "margin": 5,  "max_sl": 0.200 }
+  },
+  "swing_rules": {
+    "major":  { "lev": 5, "margin": 10, "max_sl": 0.060 },
+    "midcap": { "lev": 3, "margin": 7,  "max_sl": 0.140 },
+    "new":    { "lev": 2, "margin": 5,  "max_sl": 0.300 }
+  }
+}
