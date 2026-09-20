@@ -1,4 +1,4 @@
----
+﻿---
 name: funding
 description: >
   Funding rate scanner for Binance Futures perpetuals. Scans all tickers or
@@ -21,18 +21,18 @@ a flat position, which eats your profit target.
 
 ## Runtime Notes
 - PowerShell runs internally Ã¢â‚¬â€ use `python`
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 - Ensure VPN is active on hotspot
 
 ---
 
 ## âš ï¸ SCRIPT LOCATION â€” MANDATORY
 
-Script: `scripts/funding.py`
+Script: `tools/funding.py`
 
 **Before creating a new script, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\funding.py"
+Test-Path "tools\funding.py"
 ```
 If found, run it directly. Do not rewrite.
 
@@ -42,13 +42,13 @@ If found, run it directly. Do not rewrite.
 
 ```powershell
 # Scan all Binance Futures (show extremes + top 15)
-python "scripts\funding.py"
+python "tools\funding.py"
 
 # Check specific symbols before a scalp
-python "scripts\funding.py" SOLUSDT ETHUSDT BTCUSDT
+python "tools\funding.py" SOLUSDT ETHUSDT BTCUSDT
 
 # Check a single coin
-python "scripts\funding.py" PEPEUSDT
+python "tools\funding.py" PEPEUSDT
 ```
 
 ---
@@ -133,10 +133,10 @@ and per-symbol details when run in named-symbol mode.
 ## Integration with Daily Routine
 
 This skill is **Step 2** of the pre-session checklist:
-1. `scripts/market_bias.py`
-2. `scripts/funding.py` â† **run this second**
-3. `scripts/scanner_run.py`
-4. `scripts/scalper_analyze.py SYMBOL`
+1. `tools/market_bias.py`
+2. `tools/funding.py` â† **run this second**
+3. `tools/scanner.py`
+4. `tools/scalper.py SYMBOL`
 
 Also run it on any specific coin before entering a trade.
 

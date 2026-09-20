@@ -1,4 +1,4 @@
----
+﻿---
 name: hunter
 description: >
   Institutional pre-breakout scanner. Scans all Binance Futures tickers for coins
@@ -36,7 +36,7 @@ Key upgrades:
 ## Runtime Notes
 - PowerShell runs internally Ã¢â‚¬â€ use `python` or `curl.exe`
 - Wrap all URLs in double quotes when using curl.exe
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 - Ensure VPN is active on hotspot Ã¢â‚¬â€ Binance API may be restricted
 - Fetch ALL data before computing Ã¢â‚¬â€ do not compute mid-fetch
 
@@ -44,24 +44,24 @@ Key upgrades:
 
 ## Ã¢Å¡Â Ã¯Â¸Â PYTHON FILE NAMING CONVENTION Ã¢â‚¬â€ MANDATORY
 
-When creating any Python helper file for this skill, put it in the `scripts/` folder of this repo:
-`scripts/hunter_<purpose>.py`
+When creating any Python helper file for this skill, put it in the `tools/` folder of this repo:
+`tools/hunter_<purpose>.py`
 
 Examples:
-- `scripts/hunter_scan.py`    Ã¢â‚¬â€ full pipeline (preferred single file)
-- `scripts/hunter_filter.py`  Ã¢â‚¬â€ ticker fetch + pre-breakout filter only
-- `scripts/hunter_coil.py`    Ã¢â‚¬â€ coil scoring + trade plan for named symbols
+- `tools/hunter.py`    Ã¢â‚¬â€ full pipeline (preferred single file)
+- `tools/hunter_filter.py`  Ã¢â‚¬â€ ticker fetch + pre-breakout filter only
+- `tools/hunter_coil.py`    Ã¢â‚¬â€ coil scoring + trade plan for named symbols
 
 **Before creating a new file, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\hunter_scan.py"
-Test-Path "scripts\hunter_filter.py"
-Test-Path "scripts\hunter_coil.py"
+Test-Path "tools\hunter.py"
+Test-Path "tools\hunter_filter.py"
+Test-Path "tools\hunter_coil.py"
 ```
 If found, run directly. Do not rewrite.
 
 All Python scripts live in:
-`scripts\`
+`tools\`
 
 ---
 
@@ -101,21 +101,21 @@ Partial exit rules:
 
 ## Preferred Execution
 
-If `scripts/hunter_scan.py` exists:
+If `tools/hunter.py` exists:
 ```powershell
-python "scripts\hunter_scan.py"
+python "tools\hunter.py"
 ```
 
 This handles full pipeline: filter Ã¢â€ â€™ score Ã¢â€ â€™ trade plan Ã¢â€ â€™ output Ã¢â€ â€™ Telegram.
 
 To analyze specific symbols directly:
 ```powershell
-python "scripts\hunter_coil.py" SOLUSDT ETHUSDT
+python "tools\hunter_coil.py" SOLUSDT ETHUSDT
 ```
 
 To get the filter list only:
 ```powershell
-python "scripts\hunter_filter.py" --verbose
+python "tools\hunter_filter.py" --verbose
 ```
 
 ---

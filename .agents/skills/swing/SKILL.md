@@ -1,4 +1,4 @@
----
+﻿---
 name: swing
 description: >
   Institutional multi-day swing trading protocol. Analyzes 4H, 1D, and 1W
@@ -29,24 +29,24 @@ Institutional Edition fixes all three:
 ## Runtime Notes
 - PowerShell runs internally Ã¢â‚¬â€ use `python` or `curl.exe`
 - Wrap URLs in double quotes
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 - Ensure VPN is active on hotspot
 
 ---
 
 ## Ã¢Å¡Â Ã¯Â¸Â PYTHON FILE NAMING CONVENTION Ã¢â‚¬â€ MANDATORY
 
-When creating any Python helper file for this skill, put it in the `scripts/` folder of this repo:
-`scripts/swing_<purpose>.py`
+When creating any Python helper file for this skill, put it in the `tools/` folder of this repo:
+`tools/swing_<purpose>.py`
 
 **Before creating, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\swing_analyze.py"
+Test-Path "tools\swing.py"
 ```
 If found, run it directly. Do not rewrite.
 
 All Python scripts live in:
-`scripts\`
+`tools\`
 
 ---
 
@@ -82,14 +82,14 @@ Grade C Ã¢â€ â€™ WAITING ROOM (not a trade)
 
 ## Preferred Execution
 
-If `scripts/swing_analyze.py` exists:
+If `tools/swing.py` exists:
 ```powershell
-python "scripts\swing_analyze.py" SYMBOL
+python "tools\swing.py" SYMBOL
 ```
 
 With correlation check:
 ```powershell
-python "scripts\swing_analyze.py" SYMBOL BTCUSDT,SOLUSDT
+python "tools\swing.py" SYMBOL BTCUSDT,SOLUSDT
 ```
 
 ---

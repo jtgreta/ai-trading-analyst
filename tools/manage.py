@@ -26,13 +26,13 @@ What it does:
 """
 
 import sys
-import os
 
 from datetime import datetime
-from trading_utils import (
+from trading import (
     fetch_klines, fetch_ticker, fetch_funding_rate,
     detect_bos_choch, rsi, atr,
     fmt, send_telegram, get_session_info, print_session_check,
+    pct_from, distance_pct,
     SCALP_RULES, classify_token
 )
 
@@ -41,8 +41,6 @@ if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
     except Exception:
         pass
-
-CAPITAL = 100.0
 
 
 def parse_args():
@@ -65,16 +63,6 @@ def parse_args():
         print("ENTRY, SL, TP1, TP2 must be numbers.")
         sys.exit(1)
     return symbol, direction, entry, sl, tp1, tp2
-
-
-def pct_from(price: float, ref: float) -> float:
-    """Percent change from ref to price."""
-    return (price - ref) / ref * 100 if ref != 0 else 0
-
-
-def distance_pct(price: float, level: float) -> float:
-    """Distance from current price to a level, as % of current price."""
-    return abs(price - level) / price * 100 if price != 0 else 0
 
 
 def assess_position(symbol, direction, entry, sl, tp1, tp2):

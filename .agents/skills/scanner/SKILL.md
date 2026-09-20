@@ -1,4 +1,4 @@
----
+﻿---
 name: scanner
 description: >
   Institutional Binance Futures scanner. Fetches all tickers in one call, filters
@@ -32,29 +32,29 @@ Institutional Edition changes the ranking engine to SMC-first:
 ## Runtime Notes
 - PowerShell runs internally Ã¢â‚¬â€ use `python` or `curl.exe`
 - Do NOT loop API calls per symbol in Step 1 Ã¢â‚¬â€ batch process only
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 - Ensure VPN is active on hotspot
 
 ---
 
 ## Ã¢Å¡Â Ã¯Â¸Â PYTHON FILE NAMING CONVENTION Ã¢â‚¬â€ MANDATORY
 
-When creating any Python helper file for this skill, put it in the `scripts/` folder of this repo:
-`scripts/scanner_<purpose>.py`
+When creating any Python helper file for this skill, put it in the `tools/` folder of this repo:
+`tools/scanner_<purpose>.py`
 
 Examples:
-- `scripts/scanner_run.py`     Ã¢â‚¬â€ full SMC pipeline (preferred)
-- `scripts/scanner_filter.py`  Ã¢â‚¬â€ ticker fetch + filter only (standalone utility)
+- `tools/scanner.py`     Ã¢â‚¬â€ full SMC pipeline (preferred)
+- `tools/scanner_filter.py`  Ã¢â‚¬â€ ticker fetch + filter only (standalone utility)
 
 **Before creating, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\scanner_run.py"
-Test-Path "scripts\scanner_filter.py"
+Test-Path "tools\scanner.py"
+Test-Path "tools\scanner_filter.py"
 ```
 If found, run it directly. Do not rewrite.
 
 All Python scripts live in:
-`scripts\`
+`tools\`
 
 ---
 
@@ -79,9 +79,9 @@ All Python scripts live in:
 
 ## Preferred Execution
 
-If `scripts/scanner_run.py` exists:
+If `tools/scanner.py` exists:
 ```powershell
-python "scripts\scanner_run.py"
+python "tools\scanner.py"
 ```
 
 ---

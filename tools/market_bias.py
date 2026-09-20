@@ -26,10 +26,9 @@ Verdict:
 """
 
 import sys
-import os
 
 from datetime import datetime
-from trading_utils import (
+from trading import (
     fetch_klines, fetch_ticker,
     fetch_funding_rate, fetch_ls_ratio,
     detect_bos_choch, find_fvg,
@@ -223,12 +222,12 @@ def print_bias(b: dict):
     print(f"  {b['direction']}")
 
     if b["verdict"] == "🟢 RISK ON":
-        print(f"\n  → Run scanner next: python scanner_run.py")
+        print(f"\n  → Run scanner next: python scanner.py")
         print(f"  → Focus on LONG setups with 4H BOS / FVG entries")
         if b["btc_1h_trend"] != "bullish":
             print(f"  ⚠️ Note: BTC 1H is {b['btc_1h_trend']} — wait for 1H confirmation before entry")
     elif b["verdict"] == "🔴 RISK OFF":
-        print(f"\n  → Run scanner next: python scanner_run.py")
+        print(f"\n  → Run scanner next: python scanner.py")
         print(f"  → Focus on SHORT setups only")
         if b["btc_1h_trend"] != "bearish":
             print(f"  ⚠️ Note: BTC 1H is {b['btc_1h_trend']} — 4H bearish but 1H conflicting, size down")

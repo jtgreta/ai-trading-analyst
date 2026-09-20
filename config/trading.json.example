@@ -1,5 +1,5 @@
-{
-  "_comment": "Copy this file to config/trading.json and edit for your own account. Loaded by scripts/trading_utils.py at runtime. Any key can be removed to fall back to the built-in default. See docs/trading_profile.md for guidance on choosing values.",
+﻿{
+  "_comment": "Copy this file to config/trading.json and edit for your own account. Loaded by the tools/trading package at runtime. Any key can be removed to fall back to the built-in default. See docs/trading_profile.md for guidance on choosing values.",
   "capital": 100.0,
   "max_risk": 4.0,
   "min_rr": 2.0,

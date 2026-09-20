@@ -1,4 +1,4 @@
----
+﻿---
 name: journal
 description: >
   Trade logger, compliance tracker, and weekly review generator. Logs every
@@ -26,18 +26,18 @@ actually producing positive expectancy over time.
 
 ## Runtime Notes
 - PowerShell runs internally Ã¢â‚¬â€ use `python`
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 - Saves trades to `journal.json` in the repo root
 
 ---
 
 ## Ã¢Å¡Â Ã¯Â¸Â PYTHON FILE NAMING CONVENTION Ã¢â‚¬â€ MANDATORY
 
-File name: `scripts/journal.py`
+File name: `tools/journal.py`
 
 **Before creating, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\journal.py"
+Test-Path "tools\journal.py"
 ```
 If found, run it directly. Do not rewrite.
 
@@ -47,7 +47,7 @@ If found, run it directly. Do not rewrite.
 
 ### Log a Trade
 ```powershell
-python scripts/journal.py log SYMBOL DIR ENTRY SL TP1 TP2 GRADE SCORE OUTCOME [NOTE]
+python tools/journal.py log SYMBOL DIR ENTRY SL TP1 TP2 GRADE SCORE OUTCOME [NOTE]
 ```
 
 Arguments (in order):
@@ -79,16 +79,16 @@ Arguments (in order):
 
 ```powershell
 # Show last N trades (default 10)
-python scripts/journal.py list [N]
+python tools/journal.py list [N]
 
 # Weekly review Ã¢â‚¬â€ last 7 days + compliance check
-python scripts/journal.py review
+python tools/journal.py review
 
 # All-time statistics
-python scripts/journal.py stats
+python tools/journal.py stats
 
 # Remove a trade by ID
-python scripts/journal.py delete ID
+python tools/journal.py delete ID
 ```
 
 ---

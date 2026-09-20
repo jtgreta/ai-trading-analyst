@@ -1,4 +1,4 @@
----
+﻿---
 name: manage
 description: >
   Open position monitor and management advisor. Takes a live position's entry,
@@ -24,18 +24,18 @@ It enforces the management rules from `trading_rules.md`:
 
 ## Runtime Notes
 - PowerShell runs internally Ã¢â‚¬â€ use `python`
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 - Ensure VPN is active on hotspot
 
 ---
 
 ## âš ï¸ SCRIPT LOCATION â€” MANDATORY
 
-Script: `scripts/manage.py`
+Script: `tools/manage.py`
 
 **Before creating a new script, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\manage.py"
+Test-Path "tools\manage.py"
 ```
 If found, run it directly. Do not rewrite.
 
@@ -44,7 +44,7 @@ If found, run it directly. Do not rewrite.
 ## Execution
 
 ```powershell
-python "scripts\manage.py" SYMBOL DIRECTION ENTRY SL TP1 TP2
+python "tools\manage.py" SYMBOL DIRECTION ENTRY SL TP1 TP2
 ```
 
 Arguments (in order):

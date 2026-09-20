@@ -19,9 +19,8 @@ Output:
 """
 
 import sys
-import os
 
-from trading_utils import fetch_all_tickers, EXCLUDE_SUBS, EXCLUDE_EXACT, fmt
+from trading import fetch_all_tickers, hunter_candidates, fmt
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
@@ -30,62 +29,12 @@ if hasattr(sys.stdout, 'reconfigure'):
         pass
 
 
-def get_hunter_candidates(tickers: list) -> tuple:
-    """
-    Filter tickers against Hunter pre-breakout criteria.
-    Returns (candidates list, relaxed bool).
-    Each candidate dict contains: symbol, quoteVolume, lastPrice, pctChange, range24h, absChange.
-    """
-
-    def _apply_filter(tickers, range_max):
-        out = []
-        for t in tickers:
-            sym = t.get("symbol", "")
-            if any(sub in sym for sub in EXCLUDE_SUBS):
-                continue
-            if sym in EXCLUDE_EXACT:
-                continue
-            try:
-                qv  = float(t["quoteVolume"])
-                pcp = float(t["priceChangePercent"])
-                hi  = float(t["highPrice"])
-                lo  = float(t["lowPrice"])
-                lp  = float(t["lastPrice"])
-                if lo <= 0 or lp <= 0:
-                    continue
-                rng = (hi - lo) / lo * 100
-                ac  = abs(pcp)
-                if qv > 100_000_000 and 3 < rng < range_max and ac < 15:
-                    out.append({
-                        "symbol":      sym,
-                        "quoteVolume": qv,
-                        "lastPrice":   lp,
-                        "pctChange":   pcp,
-                        "range24h":    rng,
-                        "absChange":   ac,
-                    })
-            except Exception:
-                continue
-        return out
-
-    candidates = _apply_filter(tickers, range_max=25)
-    relaxed    = False
-
-    if len(candidates) < 5:
-        candidates = _apply_filter(tickers, range_max=30)
-        relaxed    = True
-
-    # Sort by volume descending — highest liquidity first
-    candidates.sort(key=lambda x: x["quoteVolume"], reverse=True)
-    return candidates, relaxed
-
-
 def main():
     verbose = "--verbose" in sys.argv or "-v" in sys.argv
 
     if verbose:
         print(f"\n{'─'*65}")
-        print(f"  🎯 HUNTER FILTER — Pre-Breakout Candidate Screen")
+        print("  🎯 HUNTER FILTER — Pre-Breakout Candidate Screen")
         print(f"{'─'*65}")
         print("\n  Fetching Binance Futures tickers...")
 
@@ -95,7 +44,7 @@ def main():
             print("  ✗ No ticker data. Check VPN.")
         sys.exit(1)
 
-    candidates, relaxed = get_hunter_candidates(tickers)
+    candidates, relaxed = hunter_candidates(tickers)
 
     if verbose:
         print(f"\n  {len(candidates)} coins passed Hunter pre-breakout filter"
@@ -110,7 +59,7 @@ def main():
                 f" {c['range24h']:<10.1f}% {tag} {c['pctChange']:>+7.2f}%  {fmt(c['lastPrice'])}"
             )
         print(f"\n  → To analyze coils: python hunter_coil.py {' '.join(c['symbol'] for c in candidates[:5])} ...")
-        print(f"  → Full pipeline   : python hunter_scan.py")
+        print("  → Full pipeline   : python hunter.py")
     else:
         # Machine-readable: comma-separated symbols, no trailing newline noise
         print(",".join(c["symbol"] for c in candidates))

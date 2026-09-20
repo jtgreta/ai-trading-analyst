@@ -1,0 +1,22 @@
+﻿[project]
+name = "ai-trading-analyst"
+version = "1.0.0"
+description = "Institutional-style Binance Futures trading script suite (SMC-based)."
+readme = "README.md"
+requires-python = ">=3.9"
+
+# Engines are run as plain scripts: python tools/<name>.py
+# The shared runtime is the tools/trading package, imported from the same
+# folder as the scripts (no installation step required).
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+extend-exclude = ["tools/trading/.pyc"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "C4", "B"]
+ignore = ["E501"]  # line length is enforced by black

@@ -33,19 +33,16 @@ Purpose: Enables the mandatory weekly review from docs/trading_rules.md.
 """
 
 import sys
-import os
-import json
+
 from datetime import datetime, timedelta
 
-from trading_utils import send_telegram, get_session_info
+from trading import send_telegram, load_journal, save_journal, next_id
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
         sys.stdout.reconfigure(encoding='utf-8')
     except Exception:
         pass
-
-JOURNAL_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "journal.json")
 
 VALID_OUTCOMES = {
     "win_tp1":    ("WIN",  "Closed at TP1 (35%)"),
@@ -59,30 +56,6 @@ VALID_OUTCOMES = {
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# STORAGE
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-def load_journal() -> list:
-    if not os.path.exists(JOURNAL_FILE):
-        return []
-    try:
-        with open(JOURNAL_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data if isinstance(data, list) else []
-    except Exception:
-        return []
-
-
-def save_journal(trades: list):
-    with open(JOURNAL_FILE, "w", encoding="utf-8") as f:
-        json.dump(trades, f, indent=2, ensure_ascii=False)
-
-
-def next_id(trades: list) -> int:
-    return max((t.get("id", 0) for t in trades), default=0) + 1
-
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # LOG A TRADE
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -92,10 +65,8 @@ def cmd_log(args: list):
         print("Example: journal log SOLUSDT LONG 145.5 140 156 165 B 7 win_tp1")
         sys.exit(1)
 
-    symbol    = args[0].upper()
+    symbol = args[0].upper()
     direction = args[1].upper()
-    outcome   = args[9].lower() if len(args) > 9 else args[8].lower()
-    note      = " ".join(args[10:]) if len(args) > 10 else ""
 
     # Reorder: SYMBOL DIR ENTRY SL TP1 TP2 GRADE SCORE OUTCOME [NOTE]
     try:

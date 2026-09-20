@@ -1,4 +1,4 @@
----
+﻿---
 name: scalper
 description: >
   Institutional multi-timeframe crypto scalping protocol. Fetches live Binance
@@ -17,23 +17,23 @@ version: institutional
 - PowerShell runs internally Ã¢â‚¬â€ use `python` or `curl.exe`
 - Wrap all URLs in double quotes when using curl.exe
 - Ensure VPN is active on hotspot Ã¢â‚¬â€ Binance API may be restricted
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 
 ---
 
 ## Ã¢Å¡Â Ã¯Â¸Â PYTHON FILE NAMING CONVENTION Ã¢â‚¬â€ MANDATORY
 
-When creating any Python helper file for this skill, put it in the `scripts/` folder of this repo:
-`scripts/scalper_<purpose>.py`
+When creating any Python helper file for this skill, put it in the `tools/` folder of this repo:
+`tools/scalper_<purpose>.py`
 
 **Before creating, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\scalper_analyze.py"
+Test-Path "tools\scalper.py"
 ```
 If found, run it directly. Do not rewrite.
 
 All Python scripts live in:
-`scripts\`
+`tools\`
 
 ---
 
@@ -70,14 +70,14 @@ Setup Grade:
 
 ## Preferred Execution
 
-If `scripts/scalper_analyze.py` exists:
+If `tools/scalper.py` exists:
 ```powershell
-python "scripts\scalper_analyze.py" SYMBOL
+python "tools\scalper.py" SYMBOL
 ```
 
 With open positions (correlation check):
 ```powershell
-python "scripts\scalper_analyze.py" SYMBOL ETHUSDT,SOLUSDT
+python "tools\scalper.py" SYMBOL ETHUSDT,SOLUSDT
 ```
 
 ---

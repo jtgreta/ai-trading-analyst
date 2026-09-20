@@ -1,90 +1,62 @@
-"""
-swing_analyze.py — Institutional Edition (prompt.txt v3)
-Usage: python swing_analyze.py SYMBOL [open1,open2,...]
+"""Swing — institutional multi-timeframe swing protocol (1W/1D/4H).
 
-Output Format (4 mandatory sections per prompt.txt):
+Usage: ``python swing.py SYMBOL [open1,open2,...]``
+
+Output format (4 mandatory sections):
   Section 1: SESSION CHECK — current PHT window + quality
   Section 2: MARKET STRUCTURE SUMMARY — full SMC context (1W/1D)
-  Section 3A: TRADE PLAN — when score ≥6 and hard filters pass
+  Section 3A: TRADE PLAN — when score >= 6 and hard filters pass
   Section 3B: WAITING ROOM — when no trade fires (replaces dead-end BLOCKED)
   Section 4: TELEGRAM SUMMARY — always sent
 
-Hard Rules (never violated):
-  - SL always set before entry
-  - Min RR 1:2 (TP1 ≥ 2× SL distance)
-  - Max risk $3-$4
-  - Score <6 = WAITING ROOM
-  - WAITING ROOM always fires when no valid trade
+Hard rules (never violated):
+  * SL always set before entry
+  * Min RR 1:2 (TP1 >= 2x SL distance)  |  Max risk $3-$4
+  * Score < 6 = WAITING ROOM  |  WAITING ROOM always fires when no valid trade
+
+Wide ATR multiplier (2.0) suits 2-14 day holds of 15-40%+.
 """
 
-import sys
-import os
+from __future__ import annotations
 
-from trading_utils import (
-    fetch_klines, fetch_ticker, send_telegram,
-    classify_token, calc_position,
-    sma, ema,
-    detect_bos_choch, find_fvg, detect_order_blocks,
-    detect_liquidity, detect_divergence, identify_inducement,
-    format_telegram_trade, format_telegram_waiting,
-    print_session_check, print_market_structure, print_trade_plan, print_waiting_room,
-    get_session_info, get_next_session_window,
-    fmt, grade_label, SWING_RULES, correlation_warning, MIN_RR
+import sys
+
+from trading import (
+    SWING_RULES,
+    calc_atr_stop_swing,
+    calc_position,
+    classify_token,
+    correlation_warning,
+    detect_bos_choch,
+    detect_divergence,
+    detect_liquidity,
+    detect_order_blocks,
+    fetch_klines,
+    fetch_ticker,
+    find_fvg,
+    fmt,
+    format_telegram_trade,
+    format_telegram_waiting,
+    get_session_info,
+    print_market_structure,
+    print_session_check,
+    print_trade_plan,
+    print_waiting_room,
+    send_telegram,
+    sma,
 )
 
-if hasattr(sys.stdout, 'reconfigure'):
+if hasattr(sys.stdout, "reconfigure"):
     try:
-        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
 
-# ── Hard Filter Thresholds ─────────────────────────────────────────────────────
+# ── Hard filter thresholds ────────────────────────────────────────────────────
 MIN_SCORE = 6
 
-def calc_atr_stop_swing(klines: list, entry_price: float, direction: str, 
-                  multiplier: float = 2.0, period: int = 14,
-                  max_sl_pct: float = 0.05) -> dict:
-    """ATR calculation for swing trades (wider multiplier)."""
-    if not klines or len(klines) < period * 2:
-        sl = entry_price * (1 - max_sl_pct) if direction == "LONG" else entry_price * (1 + max_sl_pct)
-        dist = abs(entry_price - sl)
-        return {
-            "atr_value": None,
-            "sl": round(sl, 4),
-            "sl_pct": max_sl_pct,
-            "tp1": round(entry_price + (dist * 2.0) if direction == "LONG" else entry_price - (dist * 2.0), 4),
-            "tp2": round(entry_price + (dist * 3.5) if direction == "LONG" else entry_price - (dist * 3.5), 4),
-            "tp3": "Trailing"
-        }
 
-    tr_list = []
-    for i in range(1, len(klines)):
-        h = float(klines[i][2])
-        l = float(klines[i][3])
-        pc = float(klines[i-1][4])
-        tr = max(h - l, abs(h - pc), abs(l - pc))
-        tr_list.append(tr)
-
-    atr = sum(tr_list[-period:]) / period
-    atr_dist = atr * multiplier
-    max_dist = entry_price * max_sl_pct
-    
-    sl_dist = min(atr_dist, max_dist)
-    
-    sl = entry_price - sl_dist if direction == "LONG" else entry_price + sl_dist
-    actual_sl_pct = sl_dist / entry_price
-    
-    return {
-        "atr_value": atr,
-        "sl": round(sl, 4),
-        "sl_pct": actual_sl_pct,
-        "tp1": round(entry_price + (sl_dist * 2.0) if direction == "LONG" else entry_price - (sl_dist * 2.0), 4),
-        "tp2": round(entry_price + (sl_dist * 3.5) if direction == "LONG" else entry_price - (sl_dist * 3.5), 4),
-        "tp3": "Trailing"
-    }
-
-
-def analyze_swing(symbol: str, open_positions: list = None):
+def analyze_swing(symbol: str, open_positions: list = None) -> None:
     if open_positions is None:
         open_positions = []
 
@@ -97,7 +69,7 @@ def analyze_swing(symbol: str, open_positions: list = None):
     print(f"  {symbol} — Institutional Swing Analysis")
     print(f"{'═'*60}")
 
-    # For swing trades, Asian session is fine for management, but still flag it
+    # Asian session is fine for swing management, but still flag context.
     print_session_check(session)
 
     print("\n[1/5] Fetching daily/weekly market data...")
@@ -120,11 +92,13 @@ def analyze_swing(symbol: str, open_positions: list = None):
     ms_4h = detect_bos_choch(k4h, lookback=40)
 
     fvgs_1d = find_fvg(k1d, lookback=20)
-    obs_4h  = detect_order_blocks(k4h, lookback=40)
-    liq_1d  = detect_liquidity(k1d, lookback=40)
-    div_1d  = detect_divergence(k1d, lookback=40)
+    obs_4h = detect_order_blocks(k4h, lookback=40)
+    liq_1d = detect_liquidity(k1d, lookback=40)
+    div_1d = detect_divergence(k1d, lookback=40)
 
-    def mas(closes): return {p: sma(closes, p) for p in [20, 50, 100, 200]}
+    def mas(closes):
+        return {p: sma(closes, p) for p in [20, 50, 100, 200]}
+
     ma_1d = mas(cl_1d)
 
     # ══════════════════════════════════════════════════════════════════════════
@@ -145,27 +119,28 @@ def analyze_swing(symbol: str, open_positions: list = None):
     liq_eqh = fmt(liq_1d["nearest_eqh"]) if liq_1d["nearest_eqh"] else "NONE"
     liq_eql = fmt(liq_1d["nearest_eql"]) if liq_1d["nearest_eql"] else "NONE"
 
-    print_market_structure(ms_1w, ms_1d, "1W Macro", "1D",
-                           rsi_now, fvg_nearest, ob_nearest,
-                           liq_eqh, liq_eql)
+    print_market_structure(
+        ms_1w, ms_1d, "1W Macro", "1D",
+        rsi_now, fvg_nearest, ob_nearest, liq_eqh, liq_eql,
+    )
 
     print("\n[3/5] Scoring swing confluence...")
     score = 0
     notes = []
     hard_blocks = []
 
-    # ── HF-1: Macro Trend Gate ────────────────────────────────────────────────
+    # ── HF-1: Macro trend gate ────────────────────────────────────────────────
     if ms_1w["trend"] == "ranging":
         hard_blocks.append("HF-1: 1W macro trend is RANGING — swing trades require macro tailwind")
 
-    # ── Direction Assignment ──────────────────────────────────────────────────
+    # ── Direction assignment ──────────────────────────────────────────────────
     direction = "NEUTRAL"
     if ms_1w["trend"] == "bullish":
         direction = "LONG"
     elif ms_1w["trend"] == "bearish":
         direction = "SHORT"
 
-    # ── HF-2: Key Level Gate ──────────────────────────────────────────────────
+    # ── HF-2: Key level gate ──────────────────────────────────────────────────
     at_key_level = False
     nearby_fvg = None
     if fvgs_1d:
@@ -176,67 +151,85 @@ def analyze_swing(symbol: str, open_positions: list = None):
             notes.append(f"At 1D FVG ({dist_pct:.1f}% away)")
             score += 2
 
-    # MA Fallbacks for key level
     nearby_ma = None
     if not at_key_level:
-        if ma_1d[50] and abs(price - ma_1d[50])/price * 100 < 4.0:
-            at_key_level = True; nearby_ma = "MA50"; score += 1
+        if ma_1d[50] and abs(price - ma_1d[50]) / price * 100 < 4.0:
+            at_key_level = True
+            nearby_ma = "MA50"
+            score += 1
             notes.append("At 1D MA50")
-        elif ma_1d[20] and abs(price - ma_1d[20])/price * 100 < 4.0:
-            at_key_level = True; nearby_ma = "MA20"
-        elif ma_1d[200] and abs(price - ma_1d[200])/price * 100 < 5.0:
-            at_key_level = True; nearby_ma = "MA200"
+        elif ma_1d[20] and abs(price - ma_1d[20]) / price * 100 < 4.0:
+            at_key_level = True
+            nearby_ma = "MA20"
+        elif ma_1d[200] and abs(price - ma_1d[200]) / price * 100 < 5.0:
+            at_key_level = True
+            nearby_ma = "MA200"
 
     if not at_key_level:
         hard_blocks.append("HF-2: Price not at a key daily entry level (FVG or MA). Wait for pullback.")
 
-    # ── Soft Scoring ──────────────────────────────────────────────────────────
-    
+    # ── Soft scoring ──────────────────────────────────────────────────────────
+
     # 1W alignment (+2)
-    if ma_1d[20] and ((direction == "LONG" and price > ma_1d[20]) or (direction == "SHORT" and price < ma_1d[20])):
-        score += 2; notes.append("1W Macro trend alignment ✓")
+    if ma_1d[20] and (
+        (direction == "LONG" and price > ma_1d[20])
+        or (direction == "SHORT" and price < ma_1d[20])
+    ):
+        score += 2
+        notes.append("1W Macro trend alignment ✓")
 
     # 1D structure (+2)
     if ms_1d["last_event"] == ("BOS_up" if direction == "LONG" else "BOS_down"):
-        score += 2; notes.append("1D BOS aligns with trade direction ✓")
+        score += 2
+        notes.append("1D BOS aligns with trade direction ✓")
     elif ms_1d["last_event"] == ("ChoCh_up" if direction == "LONG" else "ChoCh_down"):
-        score += 2; notes.append("1D structural shift (ChoCh) aligns with trade direction ✓")
+        score += 2
+        notes.append("1D structural shift (ChoCh) aligns with trade direction ✓")
     elif ms_1d["last_event"] == ("ChoCh_down" if direction == "LONG" else "ChoCh_up"):
-        score -= 1; notes.append("⚠️ 1D ChoCh AGAINST trade direction — reversal risk")
+        score -= 1
+        notes.append("⚠️ 1D ChoCh AGAINST trade direction — reversal risk")
 
     # 4H structure/reversal (+2)
     if ms_4h["trend"] == ("bullish" if direction == "LONG" else "bearish"):
-        score += 2; notes.append("4H structure aligned (Pullback ending) ✓")
+        score += 2
+        notes.append("4H structure aligned (Pullback ending) ✓")
     elif ms_4h["last_event"] == ("ChoCh_up" if direction == "LONG" else "ChoCh_down"):
-        score += 2; notes.append("4H structural shift confirms reversal ✓")
+        score += 2
+        notes.append("4H structural shift confirms reversal ✓")
 
-    # Volume & Divergence
+    # Volume & divergence
     vol_1d = [float(c[7]) for c in k1d]
     if len(vol_1d) >= 21:
         avg_vol_20 = sum(vol_1d[-21:-1]) / 20
         if vol_1d[-1] > avg_vol_20:
-            score += 1; notes.append("Daily volume > 20D average ✓")
+            score += 1
+            notes.append("Daily volume > 20D average ✓")
 
     if div_1d["type"] == ("bullish" if direction == "LONG" else "bearish"):
-        score += 1; notes.append(f"1D {div_1d['type']} RSI divergence ✓")
+        score += 1
+        notes.append(f"1D {div_1d['type']} RSI divergence ✓")
 
     score = max(0, min(score, 10))
 
-    if   score >= 8: grade = "A"
-    elif score >= 6: grade = "B"
-    else:            grade = "C"
+    if score >= 8:
+        grade = "A"
+    elif score >= 6:
+        grade = "B"
+    else:
+        grade = "C"
 
     # ── Pre-conditions for WAITING ROOM ────────────────────────────────────────
     preconditions = {
         "1W Macro Direction defined": ms_1w["trend"] != "ranging",
         "Price at key 1D Level (FVG or MA)": at_key_level,
         "1D structural alignment": ms_1d["trend"] == ("bullish" if direction == "LONG" else "bearish"),
-        "4H reversal confirmed": ms_4h["trend"] == ("bullish" if direction == "LONG" else "bearish") or ms_4h["last_event"] is not None,
-        f"Score ≥{MIN_SCORE} (current: {score})": score >= MIN_SCORE
+        "4H reversal confirmed": ms_4h["trend"] == ("bullish" if direction == "LONG" else "bearish")
+        or ms_4h["last_event"] is not None,
+        f"Score ≥{MIN_SCORE} (current: {score})": score >= MIN_SCORE,
     }
 
     # ══════════════════════════════════════════════════════════════════════════
-    # SECTION 3 — TRADE PLAN or WAITING ROOM
+    # SECTION 3 — TRADE PLAN (3A) or WAITING ROOM (3B)
     # ══════════════════════════════════════════════════════════════════════════
 
     go_waiting = bool(hard_blocks) or direction == "NEUTRAL" or score < MIN_SCORE
@@ -265,9 +258,12 @@ def analyze_swing(symbol: str, open_positions: list = None):
         verify = f"Check if 1D candle closes {'above' if ms_1w['trend'] != 'bearish' else 'below'} {fmt(ms_1d.get('swing_high', price))}"
 
         print_waiting_room(
-            symbol=symbol, reasons=reasons,
-            ms_htf=ms_1w, ms_ltf=ms_1d,
-            htf_label="1W", ltf_label="1D",
+            symbol=symbol,
+            reasons=reasons,
+            ms_htf=ms_1w,
+            ms_ltf=ms_1d,
+            htf_label="1W",
+            ltf_label="1D",
             key_levels=key_levels[:4],
             preconditions=preconditions,
             next_window="Check daily at 8:00 AM PHT (daily close)",
@@ -282,8 +278,11 @@ def analyze_swing(symbol: str, open_positions: list = None):
 
         # ── SECTION 4: TELEGRAM (WAITING ROOM) ───────────────────────────────
         tg_msg = format_telegram_waiting(
-            symbol=symbol, session=session, reasons=reasons[:2],
-            trigger_level="1D FVG or MA50 pullback", next_check="Daily close (8 AM PHT)"
+            symbol=symbol,
+            session=session,
+            reasons=reasons[:2],
+            trigger_level="1D FVG or MA50 pullback",
+            next_check="Daily close (8 AM PHT)",
         )
         send_telegram(tg_msg)
         return
@@ -291,9 +290,9 @@ def analyze_swing(symbol: str, open_positions: list = None):
     # ── SECTION 3A: TRADE PLAN ────────────────────────────────────────────────
     print("\n[4/5] Building Swing Trade Plan...")
     tok_type = classify_token(symbol, quote_vol)
-    rules    = SWING_RULES[tok_type]
+    rules = SWING_RULES[tok_type]
 
-    # Entry refinement
+    # Entry refinement: FVG midpoint else MA pullback level.
     entry = price
     entry_note = "Current market price"
     if nearby_fvg:
@@ -303,11 +302,11 @@ def analyze_swing(symbol: str, open_positions: list = None):
         entry = ma_1d[int(nearby_ma.replace("MA", ""))]
         entry_note = f"1D {nearby_ma}"
 
-    # Use 4H ATR for swing stops
-    stops = calc_atr_stop_swing(k4h, entry, direction, 
-                          multiplier=2.0, period=14, 
-                          max_sl_pct=rules["max_sl"])
-                          
+    # Wide ATR stops (4H) for multi-day holds.
+    stops = calc_atr_stop_swing(
+        k4h, entry, direction,
+        multiplier=2.0, period=14, max_sl_pct=rules["max_sl"],
+    )
     sizing = calc_position(tok_type, stops["sl_pct"], mode="swing", setup_grade=grade)
 
     corr_warn = correlation_warning(open_positions, symbol)
@@ -318,14 +317,20 @@ def analyze_swing(symbol: str, open_positions: list = None):
     for n in notes:
         print(f"  {'✅' if '⚠️' not in n else '⚠️'} {n}")
 
-    # Print the trade plan
     print_trade_plan(
-        symbol=symbol, direction=direction, score=score, grade=grade,
-        entry=entry, entry_note=entry_note, stops=stops, sizing=sizing,
-        trail_callback_pct=5.0, invalidation=stops["sl"],
-        tf_label="1D"
+        symbol=symbol,
+        direction=direction,
+        score=score,
+        grade=grade,
+        entry=entry,
+        entry_note=entry_note,
+        stops=stops,
+        sizing=sizing,
+        trail_callback_pct=5.0,
+        invalidation=stops["sl"],
+        tf_label="1D",
     )
-    
+
     print("\nManagement: Swing trades take 2-14 days. Check morning and evening only.")
 
     # ══════════════════════════════════════════════════════════════════════════
@@ -335,28 +340,39 @@ def analyze_swing(symbol: str, open_positions: list = None):
     struct = {
         "tf_4h": f"1W {ms_1w['trend'].capitalize()}",
         "tf_1h": f"1D {ms_1d['trend'].capitalize()}",
-        "event": ms_1d["last_event"] or "None"
+        "event": ms_1d["last_event"] or "None",
     }
     zones = {"entry": entry, "fvg": None, "ob": None}
-    if nearby_fvg: zones["fvg"] = f"{fmt(nearby_fvg['bottom'])} – {fmt(nearby_fvg['top'])} ({nearby_fvg['type'].capitalize()})"
+    if nearby_fvg:
+        zones["fvg"] = f"{fmt(nearby_fvg['bottom'])} – {fmt(nearby_fvg['top'])} ({nearby_fvg['type'].capitalize()})"
 
     risk_data = {
-        "sl": stops["sl"], "sl_pct": stops["sl_pct"] * 100,
-        "tp1": stops["tp1"], "tp2": stops["tp2"], "tp3": stops["tp3"],
-        "risk_usd": sizing["risk"], "margin": sizing["margin"], "lev": sizing["lev"]
+        "sl": stops["sl"],
+        "sl_pct": stops["sl_pct"] * 100,
+        "tp1": stops["tp1"],
+        "tp2": stops["tp2"],
+        "tp3": stops["tp3"],
+        "risk_usd": sizing["risk"],
+        "margin": sizing["margin"],
+        "lev": sizing["lev"],
     }
 
     tg_msg = format_telegram_trade(
-        symbol=symbol, direction=direction, grade=grade,
-        session=session, structure=struct, zones=zones,
-        risk=risk_data, invalidation=stops["sl"]
+        symbol=symbol,
+        direction=direction,
+        grade=grade,
+        session=session,
+        structure=struct,
+        zones=zones,
+        risk=risk_data,
+        invalidation=stops["sl"],
     )
     send_telegram(tg_msg)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python swing_analyze.py SYMBOL [open1,open2,...]")
+        print("Usage: python swing.py SYMBOL [open1,open2,...]")
         sys.exit(1)
     sym = sys.argv[1].upper()
     open_pos = sys.argv[2].split(",") if len(sys.argv) > 2 else []

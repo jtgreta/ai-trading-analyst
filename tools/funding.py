@@ -25,10 +25,9 @@ Output Sections:
 """
 
 import sys
-import os
 
 from datetime import datetime
-from trading_utils import (
+from trading import (
     fetch_all_funding_rates, fetch_funding_rate,
     fetch_open_interest,
     EXCLUDE_SUBS, EXCLUDE_EXACT,

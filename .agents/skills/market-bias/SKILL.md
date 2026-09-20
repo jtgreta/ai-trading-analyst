@@ -1,4 +1,4 @@
----
+﻿---
 name: market-bias
 description: >
   Pre-session market bias briefing. Fetches BTC and ETH structure, funding rate,
@@ -20,18 +20,18 @@ without a trend filter. This skill provides that filter.
 
 ## Runtime Notes
 - PowerShell runs internally Ã¢â‚¬â€ use `python`
-- trading_utils.py lives in scripts/trading_utils.py (no repo-root dependency) - scripts import it directly from the same folder
+- The shared `tools/trading` package provides all SMC logic, session gating, sizing, formatters, and API helpers — scripts import it directly from the same folder.
 - Ensure VPN is active on hotspot
 
 ---
 
 ## Ã¢Å¡Â Ã¯Â¸Â PYTHON FILE NAMING CONVENTION Ã¢â‚¬â€ MANDATORY
 
-File name: `scripts/market_bias.py`
+File name: `tools/market_bias.py`
 
 **Before creating a new script, ALWAYS check if it already exists:**
 ```powershell
-Test-Path "scripts\market_bias.py"
+Test-Path "tools\market_bias.py"
 ```
 If found, run it directly. Do not rewrite.
 
@@ -41,10 +41,10 @@ If found, run it directly. Do not rewrite.
 
 ```powershell
 # Full briefing (default)
-python "scripts\market_bias.py"
+python "tools\market_bias.py"
 
 # One-line verdict only
-python "scripts\market_bias.py" --quiet
+python "tools\market_bias.py" --quiet
 ```
 
 ---
@@ -145,10 +145,10 @@ Sends compact verdict with BTC price, structure, funding, LS ratio, and directiv
 ## Integration with Daily Routine
 
 This skill is **Step 1** of the pre-session checklist:
-1. `scripts/market_bias.py` Ã¢â€ Â **run this first**
-2. `scripts/funding.py`
-3. `scripts/scanner_run.py`
-4. `scripts/scalper_analyze.py SYMBOL`
+1. `tools/market_bias.py` Ã¢â€ Â **run this first**
+2. `tools/funding.py`
+3. `tools/scanner.py`
+4. `tools/scalper.py SYMBOL`
 
 ---
 

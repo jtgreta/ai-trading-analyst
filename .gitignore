@@ -16,6 +16,9 @@ __pycache__/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# Generated chart/data output (regenerable — never commit)
+reports/_generated/
+
 # IDEs
 .vscode/
 .idea/
@@ -25,8 +28,8 @@ __pycache__/
 # Project specific
 # Trade journal data (personal, user-specific)
 journal.json
-# Personal trader profile (user-specific)
-trading_profile.md
+# Personal trader profile (user-specific, filled copy lives in config/)
+config/trading_profile.md
 # User risk config (use config/trading.json.example)
 config/trading.json
 # Local helper script (user-specific)
