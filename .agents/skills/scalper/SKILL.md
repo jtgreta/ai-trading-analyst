@@ -219,7 +219,7 @@ SHORT: SL = entry + sl_distance
 
 TP1 = entry Ã‚Â± sl_distance Ãƒâ€” 2.0  (RR 1:2)
 TP2 = entry Ã‚Â± sl_distance Ãƒâ€” 3.5  (RR 1:3.5)
-TP3 = Trailing Stop (trail distance = sl_distance)
+TP3 = Trailing Stop — activation = TP2, size = 100% of remaining, callback = ATR-derived %
 ```
 
 Use max_sl_pct as a cap: SL distance never exceeds token type's max SL%.
@@ -268,7 +268,11 @@ Print in this exact order:
 
 **Section 3A: TRADE PLAN (If score Ã¢â€°Â¥ 6 and all hard filters pass)**
 - Direction, grade, entry zone (refined: FVG Ã¢â€ â€™ OB Ã¢â€ â€™ OTE Ã¢â€ â€™ market price)
-- ATR-based stops (SL, TP1 35%, TP2 40%, TP3 Trail)
+- ATR-based stops (SL, TP1 35%, TP2 40% of remaining, TP3 Trail remainder)
+  - Partial TP convention (CEX): each TP = % of the position remaining when
+    that TP fills (TP2 40% = 40% of whatever remained after TP1).
+- Trailing stop (TP3, runner after TP2): always 3 inputs — activation = TP2,
+  size = 100% of the remaining position, callback/variance = ATR-derived %.
 - Trailing stop callback % (ATR-derived, volatility-adjusted)
 - Position sizing ($3-$4 max risk)
 - Invalidation: "4H candle close [above/below] [SL level]"

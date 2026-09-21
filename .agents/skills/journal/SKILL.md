@@ -68,8 +68,12 @@ Arguments (in order):
 | Outcome | Result | Meaning |
 |---|---|---|
 | `win_tp1` | WIN | Closed at TP1 (35%) |
-| `win_tp2` | WIN | Closed at TP2 (40%) |
+| `win_tp2` | WIN | Closed at TP2 (40% of remaining) |
 | `win_tp3` | WIN | Closed at TP3 / trailing stop |
+
+> **Partial TP convention (CEX):** the percentages are exchange partials -
+> each TP closes a % of the position remaining when it fills (TP2 = 40% of
+> whatever remained after TP1).
 | `win_early` | WIN | Manual exit in profit |
 | `loss_sl` | LOSS | Stopped out at SL |
 | `loss_early` | LOSS | Manual exit at a loss |
@@ -144,7 +148,7 @@ auto-detected from the log alone. Use the weekly review questions to self-assess
 ```
   Ã¢Å“â€¦ Trade #7 logged
   Ã°Å¸Å¸Â¢ SOLUSDT LONG | Grade B | Score 7/10
-  Outcome: Closed at TP1 (35%) | RR: +2.00
+  Outcome: Closed at TP1 (35%) | RR: +0.70
 ```
 
 ### `stats` / `review` output:

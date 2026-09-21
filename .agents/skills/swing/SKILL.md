@@ -227,9 +227,15 @@ LONG:  SL = entry - sl_distance
 SHORT: SL = entry + sl_distance
 
 TP1 = entry Ã‚Â± sl_distance Ãƒâ€” 2.0   RR 1:2  (close 30%)
-TP2 = entry Ã‚Â± sl_distance Ãƒâ€” 3.5   RR 1:3.5 (close 40%)
-TP3 = Trailing Stop (trail distance = sl_distance) (30%)
+TP2 = entry Ã‚Â± sl_distance Ãƒâ€” 3.5   RR 1:3.5 (close 40% of remaining)
+TP3 = Trailing Stop — activation = TP2, size = 100% of remaining, callback = ATR-derived %
 ```
+
+**Partial TP convention (CEX):** TP percentages are exchange partials - each
+TP closes a % of the position remaining when that TP fills (TP2 = 40% of
+whatever remained after TP1). The trailing stop (TP3, runner after TP2) is
+always set as: activation = TP2, size = 100% of the remaining position,
+callback/variance = ATR-derived %.
 
 Why 4H ATR for swing (not 1D)? Daily ATR is too wide for a $100 account Ã¢â‚¬â€
 it would push sl_distance beyond max_sl% on most altcoins. 4H ATR Ãƒâ€” 2.0

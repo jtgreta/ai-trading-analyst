@@ -25,6 +25,7 @@ from trading import (
     SCALP_RULES,
     atr,
     calc_position,
+    calc_trail_callback_pct,
     classify_token,
     detect_bos_choch,
     detect_order_blocks,
@@ -315,6 +316,9 @@ def print_setup(i: int, cand: dict, sig: dict, plan: dict) -> None:
     idm_txt = f"  {sig['idm_flag']}" if sig["idm_flag"] else ""
     rsi_txt = f"  {sig['rsi_flag']}" if sig["rsi_flag"] else ""
     atr_txt = f"ATR: {fmt(sig['atr_val'])} ({sig['atr_pct']:.2f}%)" if sig["atr_val"] else ""
+    cb_pct = calc_trail_callback_pct(
+        sig.get("atr_val"), plan["entry_mid"], plan["token_type"]
+    )
 
     print(f"""
 {'─'*60}
@@ -329,8 +333,11 @@ Why now    : {why}{idm_txt}{fvg_txt}{ob_txt}{rsi_txt}
                (enter on breakout CLOSE {'above' if direction=='LONG' else 'below'} {fmt(plan['entry_high'] if direction=='LONG' else plan['entry_low'])} + volume)
   Stop-Loss  : {fmt(plan['sl'])}  ({plan['sl_pct']:.2f}% from mid){'  ⚠️  WIDE' if plan['wide_stop'] else ''}
   TP1 (35%)  : {fmt(plan['tp1'])}  — RR 1:2.0 → move SL to breakeven
-  TP2 (40%)  : {fmt(plan['tp2'])}  — RR 1:3.5 → activate trailing stop
-  TP3 (25%)  : Trailing stop  (trail = {fmt(plan['trail_dist'])})
+  TP2 (40% of rem.) : {fmt(plan['tp2'])}  — RR 1:3.5 → activate trailing stop
+  TP3 (remaining)   : Trailing Stop — runner after TP2
+                    Activation : {fmt(plan['tp2'])}  (= TP2)
+                    Size       : 100% of remaining position
+                    Callback/variance : {cb_pct:.2f}%  (ATR-derived)
 
 💰 POSITION SIZING  (Grade {plan['grade']})
   {plan['label']}  |  Margin: ${plan['margin']}  |  Lev: {plan['lev']}x  |  Position: ${plan['position']:.0f}

@@ -80,6 +80,20 @@ windows to modulate aggressiveness, not to block opportunity.
 - Use position sizing (margin/leverage) to handle risk within Grade A/B.
 - Max risk per trade: $3-$4. If sizing exceeds this, reduce margin.
 
+### Partial TP convention (CEX)
+
+- In any trade plan, partial TP percentages are understood the way exchanges
+  execute them: **each TP closes a % of the position that is still open when
+  that TP fills**, never a % of the original position (Binance/Bybit/OKX all
+  behave this way).
+- So `TP1 40%, TP2 40%` means: TP1 closes 40% of the position; TP2 then closes
+  40% of whatever remained after TP1. What is left after TP2 runs on the
+  trailing stop. Never sum the ladder as shares of the original position.
+- **Trailing stop (TP3)**: always 3 inputs — activation = TP2, size = 100% of
+  the position remaining after TP2, callback/variance = ATR-derived % of price
+  (`calc_trail_callback_pct`). Activated only when TP2 fills.
+- Canonical reference: [docs/trading_rules.md](docs/trading_rules.md).
+
 ### Hard rules (never violated)
 
 - Stop-loss is always set before entry.

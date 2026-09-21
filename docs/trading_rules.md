@@ -37,11 +37,23 @@ total risk never exceeds $4.
 ### Take-profit (TP)
 
 - Minimum RR: 1:2 (TP1 must be >= 2x SL distance).
-- Partial exits:
+- Partial exits (percentages below are the CEX partial values - see the
+  convention note that follows for what they actually do to the position):
   - **Scalps**: TP1 (35%), TP2 (40%), TP3 (trail remainder).
   - **Swings**: TP1 (30%), TP2 (40%), TP3 (trail remainder).
 - Risk management: after TP1 is hit, move SL to **breakeven**. After TP2,
   activate a trailing stop.
+- **Trailing stop (TP3, the runner after TP2)**: always set as 3 inputs —
+  activation = TP2, size = 100% of the position remaining after TP2,
+  callback/variance = ATR-derived % of price (see `tools/trading/indicators.py`).
+
+> **Partial TP convention (CEX behavior)** - partial TP percentages are always
+> expressed the way exchanges execute them: **each TP closes a % of the
+> position that remains when that TP fills**, never a % of the original
+> position. So `TP1 40%, TP2 40%` means TP1 closes 40% of the position and TP2
+> closes 40% of whatever remained after TP1; what is then left runs on the
+> trailing stop. Never add ladder numbers together as shares of the original
+> position.
 
 ## Volatility context (PHT / UTC+8)
 

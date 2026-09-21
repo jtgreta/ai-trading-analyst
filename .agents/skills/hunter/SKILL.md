@@ -78,10 +78,14 @@ Total capital: $100 | Max risk: $3.00 | Min RR: 1:2
 Grade A (score 8Ã¢â‚¬â€œ10) Ã¢â€ â€™ full margin
 Grade B (score 6Ã¢â‚¬â€œ7) Ã¢â€ â€™ half margin
 
+> **Partial TP convention (CEX):** each TP is a % of the position remaining
+> when that TP fills, never % of the original (TP2 = 40% of whatever remained
+> after TP1). See docs/trading_rules.md.
+
 Partial exit rules:
-- TP1 = 35% closed Ã¢â€ â€™ move SL to breakeven
-- TP2 = 40% closed Ã¢â€ â€™ activate trailing stop
-- TP3 = 25% trail remainder
+- TP1 = 35% closed → move SL to breakeven
+- TP2 = 40% of remaining closed → activate trailing stop
+- TP3 = remaining runner trails after TP2 (activation = TP2, size = 100% of remaining, callback = ATR-derived %)
 
 ---
 
@@ -270,7 +274,7 @@ sl_pct     = sl_distance / entry_mid
 
 TP1 = entry_mid Ã‚Â± sl_distance Ãƒâ€” 2.0
 TP2 = entry_mid Ã‚Â± sl_distance Ãƒâ€” 3.5
-TP3 = Trailing Stop (trail distance = sl_distance)
+TP3 = Trailing Stop — activation = TP2, size = 100% of remaining, callback = ATR-derived %
 
 # Refine TP1: if a nearby FVG exists in breakout direction with RR Ã¢â€°Â¥ 1.5,
 # use FVG boundary as TP1 target (more precise than raw RR multiple)
@@ -311,8 +315,11 @@ Why now    : [1Ã¢â‚¬â€œ2 sentences: which coil components + SMC signal
 Entry Zone : [low] Ã¢â‚¬â€œ [high]  (enter on breakout CLOSE [above/below] [trigger] + volume)
 Stop-Loss  : [SL]  ([SL%] from mid)
 TP1 (35%)  : [TP1] Ã¢â‚¬â€ RR 1:2.0 Ã¢â€ â€™ move SL to breakeven
-TP2 (40%)  : [TP2] Ã¢â‚¬â€ RR 1:3.5 Ã¢â€ â€™ activate trailing stop
-TP3 (25%)  : Trailing ([trail_distance] trail)
+TP2 (40% of rem.) : [TP2] Ã¢â‚¬â€ RR 1:3.5 Ã¢â€ â€™ activate trailing stop
+TP3 (remaining)   : Trailing Stop — runner after TP2
+                    Activation : [TP2]  (= TP2)
+                    Size       : 100% of remaining position
+                    Callback/variance : [X.Y]%  (ATR-derived)
 
 Ã°Å¸â€™Â° POSITION SIZING  (Grade [A/B])
 [token type] | [Lev]x | Margin: $[X] | Position: $[X]

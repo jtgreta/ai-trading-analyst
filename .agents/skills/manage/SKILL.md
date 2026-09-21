@@ -15,8 +15,12 @@ Once a trade is entered, the system had no tool to help manage it. This skill
 answers: "What should I do with this position right now?"
 
 It enforces the management rules from `trading_rules.md`:
+
+> **Partial TP convention (CEX):** the TP percentages below are exchange
+> partials - each TP is a % of the position remaining when that TP fills, not
+> % of the original position (TP2 = 40% of whatever remained after TP1).
 - TP1 hit Ã¢â€ â€™ close 35%, move SL to breakeven
-- TP2 hit Ã¢â€ â€™ close 40%, activate trailing stop
+- TP2 hit Ã¢â€ â€™ close 40% of remaining, activate trailing stop
 - Structure reversed Ã¢â€ â€™ consider early exit
 - RSI exhaustion in profit zone Ã¢â€ â€™ consider partial close
 
@@ -53,7 +57,7 @@ Arguments (in order):
 - `ENTRY`     : your actual fill price
 - `SL`        : your stop-loss level
 - `TP1`       : first take-profit (35% close Ã¢â€ â€™ move SL to BE)
-- `TP2`       : second take-profit (40% close Ã¢â€ â€™ activate trailing)
+- `TP2`       : second take-profit (40% of remaining close Ã¢â€ â€™ activate trailing)
 
 Examples:
 ```powershell
@@ -119,8 +123,11 @@ POSITION SUMMARY
 LEVELS
   SL          : [price]   ([dist%] away / Ã¢â€ Â HIT)
   TP1 (35%)   : [price]   ([dist%] away / Ã¢â€ Â HIT)
-  TP2 (40%)   : [price]   ([dist%] away / Ã¢â€ Â HIT)
-  TP3 (25%)   : Trailing (trail at SL dist after TP2)
+  TP2 (40% of rem.) : [price]   ([dist%] away / Ã¢â€ Â HIT)
+  TP3 (remaining)   : Trailing Stop — runner after TP2
+                       Activation : [TP2]  (= TP2)
+                       Size       : 100% of remaining position
+                       Callback/variance : [X.Y]%  (ATR-derived)
 
 STRUCTURE CHECK (4H)
   4H Trend    : [BULLISH/BEARISH/RANGING]
@@ -149,7 +156,7 @@ These are pulled directly from `trading_rules.md`:
 |---|---|
 | SL hit | Close immediately. Do NOT move stop. |
 | TP1 hit | Close 35%. Move SL Ã¢â€ â€™ Entry (breakeven). |
-| TP2 hit | Close 40%. Activate trailing stop on remaining 25%. |
+| TP2 hit | Close 40% (of the position remaining after TP1). Activate trailing stop on the runner (100% of what remains). |
 | Structure invalidated | Consider full exit Ã¢â‚¬â€ trade thesis broken. |
 | 3+ consecutive losses | 24-hour cooldown (flagged in advice). |
 

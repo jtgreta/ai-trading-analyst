@@ -96,7 +96,10 @@ of the time.
 ### Partial exits change the math (and protect it)
 
 The system closes in stages: TP1 (35% of position at 2R), TP2 (40% at 3.5R),
-TP3 (25% by trailing stop). Two mathematical effects:
+TP3 (remainder by trailing stop). The percentages are CEX partials - each TP closes
+a % of the position remaining when that TP fills (TP2 closes 40% of whatever
+is left after TP1). All reasoning below uses the 35% realized at TP1 and the
+65% remaining. Two mathematical effects:
 
 1.  **Variance reduction**: realizing part of the profit early flattens the
     per-trade equity swing. Compound growth roughly equals mean minus half

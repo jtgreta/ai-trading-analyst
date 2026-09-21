@@ -10,7 +10,7 @@ Usage:
   ENTRY     : Your actual entry price
   SL        : Your stop-loss level
   TP1       : First take-profit (35% close → move SL to BE)
-  TP2       : Second take-profit (40% close → activate trailing stop)
+  TP2       : Second take-profit (40% of remaining close → activate trailing stop)
 
 What it does:
   1. Fetches current live price
@@ -168,8 +168,11 @@ def assess_position(symbol, direction, entry, sl, tp1, tp2):
         advice.append("Do NOT move the stop. Accept the loss and review the setup.")
     elif tp2_hit:
         status = "🟢 TP2 HIT — Trailing"
-        advice.append("TP2 reached (40% should already be closed).")
-        advice.append("Remaining 25% should be on trailing stop — let it run.")
+        advice.append("TP2 reached (40% of the remaining position should already be closed).")
+        advice.append("Remainder is on trailing stop — let it run.")
+        if atr_1h and entry:
+            cb = atr_1h / entry * 100
+            advice.append(f"Trailing runner: activation = TP2, size = 100% of remaining, callback/variance = {cb:.2f}% (ATR-derived).")
         advice.append("Trail distance: " + (fmt(atr_1h) + " (ATR-based)" if atr_1h else "manual"))
     elif tp1_hit:
         status = "🟢 TP1 HIT — Manage"
@@ -223,6 +226,7 @@ def assess_position(symbol, direction, entry, sl, tp1, tp2):
         "ms_1h":        ms_1h,
         "rsi_1h":       rsi_1h,
         "fund_rate":    fund_rate,
+        "atr_1h":       atr_1h,
         "tok_type":     tok_type,
         "margin":       margin,
         "position":     position,
@@ -253,8 +257,13 @@ def print_management(r: dict, session: dict):
     tp2_arrow = "← ✅ HIT" if r["tp2_hit"] else f"({r['dist_tp2']:.2f}% away)"
     print(f"  SL          : {fmt(r['sl'])}   {sl_arrow}")
     print(f"  TP1 (35%)   : {fmt(r['tp1'])}   {tp1_arrow}")
-    print(f"  TP2 (40%)   : {fmt(r['tp2'])}   {tp2_arrow}")
-    print(f"  TP3 (25%)   : Trailing (trail at SL dist after TP2)")
+    print(f"  TP2 (40% of rem.) : {fmt(r['tp2'])}   {tp2_arrow}")
+    print(f"  TP3 (remaining)   : Trailing Stop — runner after TP2")
+    if r.get("atr_1h") and r["entry"]:
+        cb = r["atr_1h"] / r["entry"] * 100
+        print(f"                       Activation : {fmt(r['tp2'])}  (= TP2)")
+        print(f"                       Size       : 100% of remaining position")
+        print(f"                       Callback/variance : {cb:.2f}%  (ATR-derived)")
 
     print(f"\nSTRUCTURE CHECK (4H)")
     if r["ms_4h"]:

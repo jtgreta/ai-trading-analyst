@@ -88,10 +88,11 @@ def print_trade_plan(
 Entry          : {fmt(entry)}  ← {entry_note}
 Stop-Loss      : {fmt(stops['sl'])}  ({sl_pct:.2f}%  |  ATR × 1.5)
 TP1 (35%)      : {fmt(stops['tp1'])}  → RR 1:{rr1:.1f}  → on hit: move SL to breakeven
-TP2 (40%)      : {fmt(stops['tp2'])}  → RR 1:{rr2:.1f}  → on hit: activate trailing stop
-TP3 (25%)      : Trailing Stop
-                  Callback rate  : {trail_callback_pct:.2f}%  (ATR-derived)
-                  Activation     : {fmt(stops['tp1'])}
+TP2 (40% of rem.)  : {fmt(stops['tp2'])}  → RR 1:{rr2:.1f}  → on hit: activate trailing stop
+TP3 (remaining)    : Trailing Stop — runner after TP2
+                  Activation        : {fmt(stops['tp2'])}  (= TP2)
+                  Size              : 100% of remaining position
+                  Callback/variance : {trail_callback_pct:.2f}%  (ATR-derived)
 
 Position
   {sizing['label']} | {sizing['lev']}x leverage | Margin: ${sizing['margin']} | Max risk: ${sizing['risk']:.2f}

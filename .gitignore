@@ -1,38 +1,64 @@
-# Environments
+# ── Environment ────────────────────────────────────────────────
 .env
-.venv
-env/
+.env.*
+!.env.example
+.venv/
 venv/
+env/
 ENV/
 env.bak/
 venv.bak/
+.python-version
 
-# Python
+# ── Python ─────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# ── Jupyter ────────────────────────────────────────────────────
+.ipynb_checkpoints/
 
-# Generated chart/data output (regenerable — never commit)
-reports/_generated/
+# ── Credentials & secrets ──────────────────────────────────────
+credentials.json
+*.p12
+*.pem
+*.key
+*.p8
 
-# IDEs
+# ── OS ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── IDEs / editors ─────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Project specific
+# ── Logs ───────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Generated artifacts (regenerable, never commit) ────────────
+reports/_generated/
+
+# ── Project-specific ───────────────────────────────────────────
 # Trade journal data (personal, user-specific)
 journal.json
 # Personal trader profile (user-specific, filled copy lives in config/)
 config/trading_profile.md
-# User risk config (use config/trading.json.example)
+# User risk config (local copy; start from config/trading.json.example)
 config/trading.json
 # Local helper script (user-specific)
 send_telegram.ps1
-*.log
-

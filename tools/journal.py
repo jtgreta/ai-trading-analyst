@@ -46,7 +46,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 VALID_OUTCOMES = {
     "win_tp1":    ("WIN",  "Closed at TP1 (35%)"),
-    "win_tp2":    ("WIN",  "Closed at TP2 (40%)"),
+    "win_tp2":    ("WIN",  "Closed at TP2 (40% of remaining)"),
     "win_tp3":    ("WIN",  "Closed at TP3 / trailing"),
     "win_early":  ("WIN",  "Manual exit in profit"),
     "loss_sl":    ("LOSS", "Stopped out at SL"),
@@ -98,31 +98,23 @@ def cmd_log(args: list):
 
     result, desc = VALID_OUTCOMES[outcome_key]
 
-    # Calculate achieved RR
+    # Calculate achieved RR (weighted by the CEX partial-TP ladder)
     sl_dist = abs(entry - sl)
-    if direction == "LONG":
-        if result == "WIN":
-            if "tp3" in outcome_key:
-                tp_used = tp2   # approximation
-            elif "tp2" in outcome_key:
-                tp_used = tp2
-            else:
-                tp_used = tp1
-            rr_achieved = (tp_used - entry) / sl_dist if sl_dist > 0 else 0
-        elif result == "LOSS":
-            rr_achieved = -(sl - entry) / sl_dist if sl_dist > 0 else -1.0
-            rr_achieved = max(rr_achieved, -1.0)
+    rr1 = (tp1 - entry) / sl_dist if direction == "LONG" else (entry - tp1) / sl_dist
+    rr2 = (tp2 - entry) / sl_dist if direction == "LONG" else (entry - tp2) / sl_dist
+    if sl_dist <= 0:
+        rr_achieved = 0.0
+    elif result == "LOSS":
+        rr_achieved = -1.0
+    elif result == "WIN":
+        if "tp1" in outcome_key:
+            rr_achieved = 0.35 * rr1
+        elif "tp2" in outcome_key:
+            rr_achieved = 0.35 * rr1 + 0.26 * rr2
         else:
-            rr_achieved = 0.0
+            rr_achieved = 0.35 * rr1 + 0.65 * rr2
     else:
-        if result == "WIN":
-            tp_used = tp1 if "tp1" in outcome_key else tp2
-            rr_achieved = (entry - tp_used) / sl_dist if sl_dist > 0 else 0
-        elif result == "LOSS":
-            rr_achieved = -(entry - sl) / sl_dist if sl_dist > 0 else -1.0
-            rr_achieved = max(rr_achieved, -1.0)
-        else:
-            rr_achieved = 0.0
+        rr_achieved = 0.0
 
     # Compliance check: was this a system-compliant trade?
     compliant = grade in ("A", "B") and score >= 6
