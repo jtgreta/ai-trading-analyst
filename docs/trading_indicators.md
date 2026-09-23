@@ -104,6 +104,50 @@ are derived from price, volume is the "fuel".
   execution guide. If the price is below VWAP, it is considered a good value
   for buyers; if above, it favors sellers.
 
+## Volume profile: VRVP / SVP and the Point of Control (PoC)
+
+Standard indicators are time series - they ignore *where* volume traded.
+Volume profile (Visible Range Volume Profile / Session Volume Profile)
+redistributes volume onto price itself, showing the distribution of what
+actually changed hands at each level.
+
+### What to watch
+
+- **PoC (Point of Control)**: the price level with the highest traded volume
+  on the profile - the market's center of value. Price gravitates to it like a
+  gravity well.
+- **HVN (High Volume Nodes)**: wide, tall profile bars - areas of heavy
+  realized trade. They act as **reaction zones**: support below, resistance
+  above, and liquidity magnets while price is in range.
+- **LVN (Low Volume Nodes)**: thin profile bars - "air" that price crosses
+  quickly. Good as *targets* (price sweeps through them) rather than reaction
+  zones.
+
+### How to use it (the useful core)
+
+1. Overlay VRVP on the active range and SVP on the current session.
+2. Find high-volume nodes that **align with the PoC** - a PoC sitting inside a
+   thick HVN is a stronger gravity well than either alone.
+3. Anchor ONE level (the cluster) as your key reaction zone.
+4. Add flanking levels up/down, but calibrate spacing by **ATR %, never a
+   fixed point count** (20 points means nothing on BTC and ~17% on OKB -
+   the same mis-calibration class as a fixed-% trail).
+5. Use VP levels as **confluence**, never standalone entries: a PoC/HVN that
+   also holds an Order Block or FVG is the high-probability zone.
+
+### The correction (what the socials get wrong)
+
+Volume profile shows **realized volume** - what already traded at each level.
+It is NOT a map of "$200M in orders waiting". High-volume nodes are magnets,
+reaction zones, and stop-hunting grounds, not a ledger of resting orders. Treat
+them as zones with a +/- ATR halo, never exact price points.
+
+```text
+POC = argmax over price of (volume-at-price)
+HVN = price rows where volume-at-price clears a multiple of the mean row volume
+LVN = price rows where volume-at-price falls below a low threshold
+```
+
 ## The mathematics behind the indicators
 
 What each indicator actually computes, why the numbers are those numbers, and
@@ -195,6 +239,9 @@ indicators align.
 1.  **Confirmation**: a ChoCh occurs on a lower timeframe (15M/5M).
 1.  **Indicators**: RSI is oversold or MACD shows a bullish crossover.
 1.  **Volume**: volume spikes on the reversal move.
+1.  **Volume profile**: the pullback retests a PoC/HVN reaction zone (the
+    VP level aligning with the OB/FVG is the strongest confluence - see the
+    volume profile section above).
 
 ## See also
 
